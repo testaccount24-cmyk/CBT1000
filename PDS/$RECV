@@ -1,0 +1,75 @@
+/* Rexx                                                               */
+/*                                                                    */
+/* This exec will create the necessary libraries for this tool.       */
+/* Invoke the exec explicitly using the following where dsname is the */
+/* name of the data set containing this exec.                         */
+/*      EXEC 'dsname($RECV)'                                          */
+/*                                                                    */
+/* You will be prompted for a high level qualifier (hlq)              */
+/*                                                                    */
+/* and it will then issue the TSO RECEIVE command for the             */
+/* the following members to create these new data sets:               */
+/*                                                                    */
+/* Member       Dataset                                               */
+/* EXEC         hlq.EXEC                                              */
+/* MSGS         hlq.MSGS                                              */
+/* PANELS       hlq.PANELS                                            */
+/* SKELS        hlq.SKELS                                             */
+/*                                                                    */
+/* You will then need to copy these data sets/members into            */
+/* data sets for production use.                                      */
+/*                                                                    */
+/* After these data sets are created several of the members           */
+/* of this install data set will be browsed.                          */
+/*                                                                    */
+Trace
+toolname = "MASSCHG"
+toollibs = "EXEC MSGS PANELS SKELS"
+tooldocs = "$README #GNULIC"
+
+Parse Source . . . . dsn . . ispf .
+x = PROMPT("ON") /* enable prompting */
+
+Say "Enter desired hlq for target data sets for "toolname,
+    "(default is" Sysvar("syspref")"."toolname".NEW):"
+Pull hlq
+hlq = Strip(hlq)
+
+If hlq = "" Then
+  hlq = Sysvar("syspref")"."toolname".NEW"
+hlq = translate(hlq)
+
+Say "Using High Level Qualifier:" hlq
+
+/* ------------------------------------------------------------ *
+ * Process the TSO RECEIVE command on all the pertinent members *
+ * ------------------------------------------------------------ */
+Address TSO
+Do lib = 1 To Words(toollibs)
+  currlib = Word(toollibs,lib)
+  Queue "dsn('"hlq"."currlib"')"
+  "RECEIVE inds('"dsn"("currlib")')"
+End
+
+/* -------------------------------------------- *
+ * If ISPF is active show key members in Browse *
+ * -------------------------------------------- */
+If ispf = "ISPF" Then
+  Do
+    Address ISPEXEC
+    Do doc = 1 To Words(tooldocs)
+      currdoc = Word(tooldocs,doc)
+      "BROWSE DATASET('"dsn"("currdoc")')"
+    End
+
+    /* ------------------------------------------------- *
+     * Now display a list of the received datasets using *
+     * ISPF LMM services (ISPF 3.4)                      *
+     * ------------------------------------------------- */
+    Address ISPEXEC
+    "LMDINIT LISTID(LISTID) LEVEL("hlq")"
+    "LMDDISP LISTID("ListId") CONFIRM(YES)",
+            "VIEW(Volume)"
+    "LMDFREE LISTID("ListId")"
+  End
+Exit

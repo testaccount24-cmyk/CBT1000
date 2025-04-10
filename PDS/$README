@@ -1,0 +1,51 @@
+MASSCHG performs an ISPF Edit Macro against all members or a selection
+of members of one to four partitioned data sets.
+
+Editing can be performed in either the foreground or in batch
+
+See HELP Tutorial panels for more information.
+
+   Members:
+
+      $README  - this member
+      $RECV    - Exec to RECEIVE the component libraries
+      EXEC     - TSO Transmit of the Rexx Execs
+      MSGS     - TSO Transmit of the ISPF Messages
+      PANELS   - TSO Transmit of the ISPF Panels
+      SKELS    - TSO Transmit of the ISPF Skeletons
+
+Installation:
+  From any ISPF command line enter:
+    TSO EX 'this.data.set.name($RECV)'
+
+Execution:
+   1. Copy the restored EXEC members into your SYSEXEC (or SYSPROC) library
+   2. Copy the restored MSGS members into your ISPMLIB library
+   3. Copy the restored PANELS members into your ISPPLIB library
+   4. Copy the restored SKELS members into your ISPSLIB library
+   5. Issue TSO MASSCHG from the command line or a menu selection
+
+                              OR
+
+   1. Issue TSO EX 'the.exec.lib.created(@MASSCHG)' which will perform
+      the necessary ALTLIB and LIBDEFS and execute MASSCHG.
+
+------------------------------------------------------------------------------
+              Send questions, suggestions and/or bug reports to:
+                                   Dan Dirkse
+                             ztools.channel@gmail.com
+------------------------------------------------------------------------------
+                    (C) Copyright The Z Tools Company, 2021
+------------------------------------------------------------------------------
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program. If not, see https://www.gnu.org/licenses/
